@@ -51,29 +51,39 @@ export function TaskForm({ mode, task, onSubmit }: TaskFormProps) {
     }
     setLoading(true);
     if (mode === "create") {
-      createTask({
-        title: title,
-        description: description,
-        assignee: assignee == "" ? undefined : assignee,
-      }).then((result) => {
-        if (result.success) {
-          setTitle("");
-          setDescription("");
-          setAssignee("");
+      createTask(assignee ? { title, description, assignee } : { title, description }).then(
+        (result) => {
+          if (result.success) {
+            setTitle("");
+            setDescription("");
+            setAssignee("");
 
-          onSubmit && onSubmit(result.data);
-        } else {
-          alert(result.error);
-        }
-        setLoading(false);
-      });
+            onSubmit && onSubmit(result.data);
+          } else {
+            alert(result.error);
+          }
+          setLoading(false);
+        },
+      );
     } else {
-      updateTask({
-        ...(task as Task),
-        title: title,
-        description: description,
-        assignee: assignee == "" ? undefined : assignee,
-      }).then((result) => {
+      updateTask(
+        assignee
+          ? {
+              _id: task?._id || "",
+              title,
+              description,
+              isChecked: task?.isChecked || false,
+              dateCreated: task?.dateCreated || new Date(""),
+              assignee,
+            }
+          : {
+              _id: task?._id || "",
+              title,
+              description,
+              isChecked: task?.isChecked || false,
+              dateCreated: task?.dateCreated || new Date(""),
+            },
+      ).then((result) => {
         if (result.success) {
           onSubmit && onSubmit(result.data);
         } else {
