@@ -30,12 +30,11 @@ export const getTask: RequestHandler = async (req, res, next) => {
 
   try {
     // if the ID doesn't exist, then findById returns null
-    const task = await TaskModel.findById(id);
+    const task = await TaskModel.findById(id).populate("assignee");
 
     if (task === null) {
       throw createHttpError(404, "Task not found.");
     }
-
     // Set the status code (200) and body (the task object as JSON) of the response.
     // Note that you don't need to return anything, but you can still use a return
     // statement to exit the function early.
@@ -49,7 +48,7 @@ export const getTask: RequestHandler = async (req, res, next) => {
 export const createTask: RequestHandler = async (req, res, next) => {
   // extract any errors that were found by the validator
   const errors = validationResult(req);
-  const { title, description, isChecked } = req.body;
+  const { title, description, isChecked, assignee } = req.body;
 
   try {
     // if there are errors, then this function throws an exception
@@ -60,11 +59,14 @@ export const createTask: RequestHandler = async (req, res, next) => {
       description: description,
       isChecked: isChecked,
       dateCreated: Date.now(),
+      assignee: assignee,
     });
+
+    const populated = await TaskModel.findById(task._id).populate("assignee");
 
     // 201 means a new resource has been created successfully
     // the newly created task is sent back to the user
-    res.status(201).json(task);
+    res.status(201).json(populated);
   } catch (error) {
     next(error);
   }
@@ -93,7 +95,7 @@ export const updateTask: RequestHandler = async (req, res, next) => {
     if (result === null) {
       res.status(404);
     } else {
-      const newTask = await TaskModel.findById(req.params.id);
+      const newTask = await TaskModel.findById(req.params.id).populate("assignee");
       res.status(200).json(newTask);
     }
   } catch (error) {

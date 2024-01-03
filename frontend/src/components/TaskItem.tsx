@@ -13,7 +13,11 @@ export function TaskItem({ task: initialTask }: TaskItemProps) {
   const [isLoading, setLoading] = useState<boolean>(false);
   const handleToggleCheck = () => {
     setLoading(true);
-    updateTask({ ...task, isChecked: !task.isChecked }).then((result) => {
+    updateTask({
+      ...task,
+      isChecked: !task.isChecked,
+      assignee: task.assignee && task.assignee._id,
+    }).then((result) => {
       if (result.success) {
         setTask(result.data);
       } else {
