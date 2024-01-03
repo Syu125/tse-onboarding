@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { Task } from "src/api/tasks";
-import { CheckButton } from "src/components";
+import { CheckButton, UserTag } from "src/components";
 import styles from "src/components/TaskItem.module.css";
 import { updateTask } from "src/api/tasks";
 import { Link } from "react-router-dom";
@@ -40,6 +40,9 @@ export function TaskItem({ task: initialTask }: TaskItemProps) {
           <Link to={`/task/${task._id}`}>{task.title}</Link>
         </span>
         {task.description && <span className={styles.description}>{task.description}</span>}
+      </div>
+      <div className={styles.assignee}>
+        <UserTag user={task.assignee} />{" "}
       </div>
     </div>
   );
